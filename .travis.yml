@@ -10,11 +10,5 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - docker-compose --version
-addons:
-  sonarcloud:
-    organization: "sivasubramanim"
-    token:
-      secure: "AVnOFRB5rYvgwh5A2NGIWKlFjdsxhEsN/Rxw32/vzjo5OEGQkt8sGPXtX488ePD6MJANhjzye+3LK2q8rDC5QBxq62r5CC7owdT0cCtBv83klKW7oSZCUViS7vGw1CxETUXXvzCfTjiFwCTnFyWBvEw47/3fBXMnP7bmt6/9TmfRF2E3qNBM8kBLZZfnCG4QJ1b+dNGUE/jPKGoYul5m5mDP41a1kMQG+Cbwvt5uQ08tM37Sh5WH+snD1hJYqTOZHsuLzBxunISSWwpSBtU0fk2ImE8k7Y+/1dFy7bjtUObPJG37GprQl2xRD3WZSunJCYQS2wBYkJz43NysbV1c6OqgPi4y4NweUV9f8u8/amU76HeLxHmW4sen7s3lM+SjpYYJC6uGkNRE8K8JSkrfTfC/CASpqXU7f+QeTvHYohLwxgzwJolIfz58hcMPp41tvRgSF/187JEkx29wqrCh1izKZ6Sch3XSiP1KMiWnFLltxd2mDrDga9OfgIzIPHNRYx9Uq5gAF5B2+E2eYU3dib9HpBftgaEZwl028WG87296GmTco3Q8wDes2uHyo0bV5Pqz5yI3ZWTSo66t3j1Lw3EdeOVFSGz58cq6fMQytFSfK4Y/Gw6e3dH1cxrLxqGZXohNRFy7rpVgaJk2i+1Vf+6v9UWnOftkPkPPaBjjcBs="
 script:
   - docker-compose build
-  - sonar-scanner
