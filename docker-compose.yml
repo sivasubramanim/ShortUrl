@@ -8,6 +8,7 @@ services:
       - spring
   redis:
     image: redis
+    container_name: redis
     command: [ "redis-server", "--protected-mode", "no" ]
     ports:
       - "6379:6379"
