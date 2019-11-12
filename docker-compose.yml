@@ -1,0 +1,28 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - spring
+  redis:
+    image: redis
+    command: [ "redis-server", "--protected-mode", "no" ]
+    ports:
+      - "6379:6379"
+    networks:
+      - spring
+  mongo:
+    image: mongo
+    container_name: springboot-mongo
+    #    ports:  # for demo/debug purpose only
+    #      - 27018:27017
+    restart: always
+    networks:
+      - spring
+
+
+networks:
+   spring:
+     external: true
