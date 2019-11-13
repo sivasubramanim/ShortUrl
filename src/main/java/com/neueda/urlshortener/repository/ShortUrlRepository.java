@@ -33,7 +33,6 @@ public class ShortUrlRepository {
     public ShortUrlRepository() {
         this.jedis = new Jedis();
         this.idKey = "id";
-
     }
 
     public ShortUrlRepository(Jedis jedis, String idKey) {
@@ -48,29 +47,23 @@ public class ShortUrlRepository {
     }
 
     public String save(String key, String value) {
-        if (stringRedisTemplate == null || !isRedisActive(key)) {
-            String valueDb = getUrlFromDb(key);
-            if (valueDb.isEmpty()) {
+        if (stringRedisTemplate != null && isRedisActive(key) && stringRedisTemplate.hasKey(key)) {
+            String redisValue = stringRedisTemplate.opsForValue().get(key);
+            if (value.equals(redisValue)) {
+                LOGGER.info("[save]: Key already exists in cache: {}", key);
+            } else {
+                Long counter = getCounter();
+                key += ShortIdGen.createUniqueID(counter);
+                saveUrlCache(key, value);
                 saveUrlDb(key, value);
             }
         } else {
-            if (!stringRedisTemplate.hasKey(key)) {
-                String valueDb = getUrlFromDb(key);
-                if (!valueDb.isEmpty()) {
-                    saveUrlCache(key, valueDb);
-                } else {
-                    saveUrlCache(key, value);
-                    saveUrlDb(key, value);
-                }
+            String valueDb = getUrlFromDb(key);
+            if (valueDb.isEmpty()) {
+                saveUrlCache(key, value);
+                saveUrlDb(key, value);
             } else {
-                String redisValue = stringRedisTemplate.opsForValue().get(key);
-                if (!redisValue.equals(value)) {
-                    Long counter = getCounter();
-                    key += ShortIdGen.createUniqueID(counter);
-                    saveUrlCache(key, value);
-                    saveUrlDb(key, value);
-                } else
-                    LOGGER.info("[save]: Key already exists: {}", key);
+                saveUrlCache(key, value);
             }
         }
         return key;
@@ -78,7 +71,7 @@ public class ShortUrlRepository {
 
     public String get(String key) {
         LOGGER.info("[get]: Retrieving at {}", key);
-        String value = "";
+        String value;
         if (stringRedisTemplate != null && isRedisActive(key))
             value = stringRedisTemplate.opsForValue().get(key);
         else {
@@ -127,13 +120,15 @@ public class ShortUrlRepository {
     }
 
     private void saveUrlCache(String key, String value) {
-        LOGGER.info("[saveUrlCache]: Saving: {} at {}", value, key);
-        stringRedisTemplate.opsForValue().set(key, value);
-        LOGGER.info("[saveUrlCache]: Saved: {} at {}", value, key);
+        if (isRedisActive(key)) {
+            LOGGER.info("[saveUrlCache]: Saving: {} at {}", value, key);
+            stringRedisTemplate.opsForValue().set(key, value);
+            LOGGER.info("[saveUrlCache]: Saved: {} at {}", value, key);
+        }
     }
 
-    private Boolean isRedisActive(String key) {
-        Boolean isActive = false;
+    private boolean isRedisActive(String key) {
+        boolean isActive = false;
         try {
             stringRedisTemplate.hasKey(key);
             isActive = true;
@@ -144,4 +139,6 @@ public class ShortUrlRepository {
         return isActive;
 
     }
+
+
 }
