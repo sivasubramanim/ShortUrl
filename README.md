@@ -15,11 +15,7 @@ The application should be readable, maintainable, and extensible where appropria
 Design and implement an API for gathering different statistics
 
 ## Solution Overview
-<<<<<<< HEAD
 The below diagram depicts a high level system view of the project.<br/>
-=======
-The below depicts a high level system view of the project.<br/>
->>>>>>> Changes to README
 ![Architecture Diagram](https://user-images.githubusercontent.com/51107434/68769937-32a1cd80-064b-11ea-822a-9c1819009143.png)
 
 Component View of the Backend Short Url Service:
@@ -29,11 +25,7 @@ Component View of the Backend Short Url Service:
 * ShortUrlMongoRepository - Manages Mongo CRUD
 * ShortIdUtilities - Manages all the application utilities
 
-<<<<<<< HEAD
 The solution is built in such a way that we can spin multiple instances of the backend service connected to the Distributed Redis cache server and MongoDB to serve multiple requests. The Redis cache server is introduced as a middle layer to improve the performance of the application.
-=======
-The solution is built in such a way that we can spin multiple instances of the backend service connected to the Distributed Redis cache server to serve multiple requests. The Redis cache server is introduced as a middle layer to improve the performance of the application.
->>>>>>> Changes to README
 
 ## Technology Stack:
 * [Spring Boot](http://spring.io/projects/spring-boot) for creating the RESTful Web Services. API for short URL creation and API for forwarding of short URLs to original ones
@@ -62,7 +54,7 @@ $ docker-compose build
 ```sh
 $ docker-compose up
 ```
-With the default setup the application should be available at http://localhost:8080/
+With the default setup, the application should be available at http://localhost:8080/
 ## API Documentation
 #### Short Url APP APIs
 
@@ -93,7 +85,4 @@ URI | HTTP Method | Description | Content-Type | Sample Input(Body) | Sample Out
 I have taken care of the MVP requirements for this project. The project has scope for future enhancements and improvements such as:
 * Enabling HTTPS for the application.
 * Implementing Authentication and Authorisation for the service
-<<<<<<< HEAD
-* Implementing other APIs for the service
-=======
 * Implementing other APIs for the service
