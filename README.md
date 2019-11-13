@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sivasubramanim/ShortUrl.svg?branch=master)](https://travis-ci.org/sivasubramanim/ShortUrl)
+
 # ShortUrl
 Application to create short Urls and implement forwarding of short Urls to original ones
 
