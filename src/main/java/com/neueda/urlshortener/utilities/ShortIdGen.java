@@ -34,7 +34,7 @@ public class ShortIdGen {
         {
             if (val(str.charAt(i)) >= base)
             {
-                LOGGER.error("Invalid Number: {}" , str);
+                LOGGER.error("[convertToBase10FromAnyBase]: Invalid Number: {}" , str);
                 return -1;
             }
             num += val(str.charAt(i)) * power;

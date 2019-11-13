@@ -3,16 +3,16 @@ package com.neueda.urlshortener.data;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ShortUrlRequest {
+public class UrlRequestResponse {
     private String url;
 
     @JsonCreator
-    public ShortUrlRequest() {
+    public UrlRequestResponse() {
 
     }
 
     @JsonCreator
-    public ShortUrlRequest(@JsonProperty("url") String url) {
+    public UrlRequestResponse(@JsonProperty("url") String url) {
         this.url = url;
     }
 

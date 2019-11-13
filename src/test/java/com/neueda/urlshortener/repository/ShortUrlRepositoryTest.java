@@ -1,22 +1,18 @@
 package com.neueda.urlshortener.repository;
 
+import com.neueda.urlshortener.repository.ShortUrlRepository;
 import com.neueda.urlshortener.utilities.TestRedisConfiguration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestRedisConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ShortUrlRepositoryTests {
+public class ShortUrlRepositoryTest {
 
     @Autowired
     private ShortUrlRepository shortUrlRepository;
@@ -50,6 +46,6 @@ public class ShortUrlRepositoryTests {
         String value="test";
         shortUrlRepository.save(key,value);
         String output =  shortUrlRepository.get(key);
-        assertNotEquals(output,value);
+        assertEquals(output,value);
     }
 }

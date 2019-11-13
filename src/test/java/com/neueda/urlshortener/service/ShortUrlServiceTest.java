@@ -2,12 +2,18 @@ package com.neueda.urlshortener.service;
 
 import com.neueda.urlshortener.repository.ShortUrlMongoRepository;
 import com.neueda.urlshortener.repository.ShortUrlRepository;
+import com.neueda.urlshortener.utilities.ShortUrlException;
 import org.junit.Before;
-import org.junit.Test;
+//import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -15,7 +21,8 @@ import java.util.Optional;
 import static junit.framework.TestCase.*;
 import static org.mockito.ArgumentMatchers.anyString;
 
-public class ShortUrlServiceTests {
+@ExtendWith(MockitoExtension.class)
+public class ShortUrlServiceTest {
 
     @InjectMocks
     private ShortUrlService shortUrlService;
@@ -25,18 +32,21 @@ public class ShortUrlServiceTests {
     public void setup(){
         MockitoAnnotations.initMocks(this);
     }
+
     @Test
     public void EmptyRequestCreateShortUrlTest(){
-        String shortId="c0a0206a";
-        String url =  shortUrlService.createShortUrl("","https://www.google.com/");
-        assertEquals(url,"");
+        Assertions.assertThrows(ShortUrlException.class, () -> {
+            shortUrlService.createShortUrl("","https://www.google.com/");
+        });
+
     }
 
     @Test
     public void EmptyLongUrlCreateShortUrlTest(){
-        String shortId="c0a0206a";
-        String url =  shortUrlService.createShortUrl("http://localhost/","");
-        assertEquals(url,"");
+        Assertions.assertThrows(ShortUrlException.class, () -> {
+            shortUrlService.createShortUrl("http://localhost/","");
+        });
+
     }
 
     @Test
@@ -48,18 +58,21 @@ public class ShortUrlServiceTests {
         assertEquals(url,requestUrl+shortId);
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test
     public void EmptyGetLongUrlTest(){
-        String encodedUrl ="aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8=";
-        Mockito.when(shortUrlRepository.get(anyString())).thenReturn(encodedUrl);
-       shortUrlService.getLongUrl("");
+
+        Assertions.assertThrows(ShortUrlException.class, () -> {
+            shortUrlService.getLongUrl("");
+        });
+
 
     }
-    @Test(expected = ResponseStatusException.class)
+    @Test
     public void NullGetLongUrlTest(){
-        String encodedUrl ="aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8=";
-        Mockito.when(shortUrlRepository.get(anyString())).thenReturn(encodedUrl);
-       shortUrlService.getLongUrl(null);
+        Assertions.assertThrows(ShortUrlException.class, () -> {
+            shortUrlService.getLongUrl(null);
+        });
+
     }
 
     @Test

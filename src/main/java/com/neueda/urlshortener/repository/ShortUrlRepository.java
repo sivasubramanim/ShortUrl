@@ -17,6 +17,7 @@ import java.util.Date;
 @Repository
 public class ShortUrlRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShortUrlRepository.class);
+
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
@@ -28,77 +29,119 @@ public class ShortUrlRepository {
 
     private final Jedis jedis;
     private final String idKey;
-    private final String urlKey;
 
     public ShortUrlRepository() {
         this.jedis = new Jedis();
         this.idKey = "id";
-        this.urlKey = "url:";
+
     }
 
-    public ShortUrlRepository(Jedis jedis, String idKey, String urlKey) {
+    public ShortUrlRepository(Jedis jedis, String idKey) {
         this.jedis = jedis;
         this.idKey = idKey;
-        this.urlKey = urlKey;
     }
 
     public Long getCounter() {
         Long counter = jedis.incr(idKey);
-        LOGGER.info("getting counter: {}", counter);
+        LOGGER.info("[getCounter]: getting counter: {}", counter);
         return counter;
     }
 
     public String save(String key, String value) {
-        if (!stringRedisTemplate.hasKey(key)) {
-            LOGGER.info("Saving: {} at {}", value, key);
-            stringRedisTemplate.opsForValue().set(key, value);
-            LOGGER.info("Saved: {} at {}", value, key);
-            ShortUrl shortUrl = createShortUrl(key, value);
-            shortUrlMongoRepository.save(shortUrl);
-            LOGGER.info("Saved into database: {}", shortUrl.toString());
-
-        } else {
-            String redisValue = stringRedisTemplate.opsForValue().get(key);
-            if (!redisValue.equals(value)) {
-                Long counter = getCounter();
-                key += ShortIdGen.createUniqueID(counter);
-                LOGGER.info("Saving with counter: {} at {}", value, key);
-                stringRedisTemplate.opsForValue().set(key, value);
-                LOGGER.info("Saved with counter: {} at {}", value, key);
-                ShortUrl shortUrl = createShortUrl(key, value);
-                shortUrlMongoRepository.save(shortUrl);
-                LOGGER.info("Saved into database: {}", shortUrl.toString());
+        if (stringRedisTemplate == null || !isRedisActive(key)) {
+            String valueDb = getUrlFromDb(key);
+            if (valueDb.isEmpty()) {
+                saveUrlDb(key, value);
             }
-            else
-                LOGGER.info("Key already exists: {}", key);
-
+        } else {
+            if (!stringRedisTemplate.hasKey(key)) {
+                String valueDb = getUrlFromDb(key);
+                if (!valueDb.isEmpty()) {
+                    saveUrlCache(key, valueDb);
+                } else {
+                    saveUrlCache(key, value);
+                    saveUrlDb(key, value);
+                }
+            } else {
+                String redisValue = stringRedisTemplate.opsForValue().get(key);
+                if (!redisValue.equals(value)) {
+                    Long counter = getCounter();
+                    key += ShortIdGen.createUniqueID(counter);
+                    saveUrlCache(key, value);
+                    saveUrlDb(key, value);
+                } else
+                    LOGGER.info("[save]: Key already exists: {}", key);
+            }
         }
         return key;
     }
 
     public String get(String key) {
-        LOGGER.info("Retrieving at {}", key);
+        LOGGER.info("[get]: Retrieving at {}", key);
         String value = "";
-        if (stringRedisTemplate.hasKey(key))
+        if (stringRedisTemplate != null && isRedisActive(key))
             value = stringRedisTemplate.opsForValue().get(key);
         else {
-            LOGGER.info("Trying to retrieve the value,key from Database: {} at {}", value, key);
-            ShortUrl shortUrl = shortUrlMongoRepository.findShortUrlByShortId(key);
-            if (shortUrl != null) {
-                value = shortUrl.getLongUrl();
-                LOGGER.info("value sucessfully retrieved from Database:{} at {}", value, key);
-                stringRedisTemplate.opsForValue().set(key, value);
-                LOGGER.info("saved into redis sucessfully");
-            }
+            value = getUrlFromDb(key);
         }
         return value;
     }
+
     private ShortUrl createShortUrl(String shortId, String longUrl) {
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setShortId(shortId);
         shortUrl.setLongUrl(longUrl);
         shortUrl.setCreatedBy(shortUrlUser);
         shortUrl.setCreatedDate(Date.from(Instant.now()));
+        shortUrl.setModifiedBy(shortUrlUser);
+        shortUrl.setModifiedDate(Date.from(Instant.now()));
         return shortUrl;
+    }
+
+    private String getUrlFromDb(String key) {
+        String value = "";
+        try {
+            LOGGER.info("[getUrlFromDb]: Trying to retrieve the value from Database for key: {}", key);
+            ShortUrl shortUrl = shortUrlMongoRepository.findShortUrlByShortId(key);
+            if (shortUrl != null && shortUrl.getLongUrl() != null) {
+                value = shortUrl.getLongUrl();
+                LOGGER.info("[getUrlFromDb]: value sucessfully retrieved from Database:{} at {}", value, key);
+                if (isRedisActive(key)) {
+                    saveUrlCache(key, value);
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("[getUrlFromDb]: {}", ex.getMessage());
+        }
+        return value;
+    }
+
+    private void saveUrlDb(String key, String value) {
+        try {
+            ShortUrl shortUrl = createShortUrl(key, value);
+            shortUrlMongoRepository.save(shortUrl);
+            LOGGER.info("[saveUrlDb]: Saved into database: {}", shortUrl);
+        } catch (Exception ex) {
+            LOGGER.error("[saveUrlDb]: {}", ex.getMessage());
+        }
+    }
+
+    private void saveUrlCache(String key, String value) {
+        LOGGER.info("[saveUrlCache]: Saving: {} at {}", value, key);
+        stringRedisTemplate.opsForValue().set(key, value);
+        LOGGER.info("[saveUrlCache]: Saved: {} at {}", value, key);
+    }
+
+    private Boolean isRedisActive(String key) {
+        Boolean isActive = false;
+        try {
+            stringRedisTemplate.hasKey(key);
+            isActive = true;
+
+        } catch (Exception ex) {
+            LOGGER.error("[isRedisActive]: {}", ex.getMessage());
+        }
+        return isActive;
+
     }
 }
