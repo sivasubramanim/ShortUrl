@@ -57,20 +57,20 @@ public class ShortUrlController {
 
     @PostMapping(value = "/shorturl", consumes = {"application/json"})
     public @ResponseBody
-    ResponseEntity<UrlRequestResponse> createShortUrl(@RequestBody UrlRequestResponse UrlRequest, HttpServletRequest request) {
-        if (UrlRequest == null || UrlRequest.getUrl() == null || UrlRequest.getUrl().isEmpty()) {
+    ResponseEntity<UrlRequestResponse> createShortUrl(@RequestBody UrlRequestResponse urlRequest, HttpServletRequest request) {
+        if (urlRequest == null || urlRequest.getUrl() == null || urlRequest.getUrl().isEmpty()) {
             meterRegistry.counter(ShortUrlConstants.CREATE_SHORT_URL_FAILURE_KEY).increment();
             LOGGER.error("[createShortUrl]: {}",ShortUrlConstants.NULL_EMPTY_URL_MESSAGE);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ShortUrlConstants.NULL_EMPTY_URL_MESSAGE);
         }
-        LOGGER.info("[createShortUrl]: Received input for url shortening: {}" , UrlRequest.getUrl());
-        if (!ShortUrlUtil.isUrlValid(UrlRequest.getUrl())) {
+        LOGGER.info("[createShortUrl]: Received input for url shortening: {}" , urlRequest.getUrl());
+        if (!ShortUrlUtil.isUrlValid(urlRequest.getUrl())) {
             meterRegistry.counter(ShortUrlConstants.CREATE_SHORT_URL_FAILURE_KEY).increment();
-            LOGGER.error("[createShortUrl]: {}",ShortUrlConstants.INVALID_URL_MESSAGE + UrlRequest.getUrl());
+            LOGGER.error("[createShortUrl]: {}",ShortUrlConstants.INVALID_URL_MESSAGE + urlRequest.getUrl());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ShortUrlConstants.INVALID_URL_MESSAGE);
         }
         try {
-            String shortUrl = shortUrlService.createShortUrl(getBaseUrl(request), UrlRequest.getUrl());
+            String shortUrl = shortUrlService.createShortUrl(getBaseUrl(request), urlRequest.getUrl());
             meterRegistry.counter(ShortUrlConstants.CREATE_SHORT_URL_SUCCESS_KEY).increment();
             LOGGER.info("[createShortUrl]: Shortened url: {}" , shortUrl);
             return new ResponseEntity<>(new UrlRequestResponse(shortUrl) , HttpStatus.OK);

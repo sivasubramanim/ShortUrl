@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.neueda</groupId>
 	<artifactId>urlshortener</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-RELEASE</version>
 	<name>urlshortener</name>
-	<description>short URL project</description>
+	<description>Application to create short Urls and implement forwarding of short Urls to original ones</description>
 
 	<properties>
 		<java.version>1.8</java.version>
