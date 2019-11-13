@@ -15,22 +15,30 @@ The application should be readable, maintainable, and extensible where appropria
 Design and implement an API for gathering different statistics
 
 ## Solution Overview
+<<<<<<< HEAD
 The below diagram depicts a high level system view of the project.<br/>
+=======
+The below depicts a high level system view of the project.<br/>
+>>>>>>> Changes to README
 ![Architecture Diagram](https://user-images.githubusercontent.com/51107434/68769937-32a1cd80-064b-11ea-822a-9c1819009143.png)
 
 Component View of the Backend Short Url Service:
-* ShortUrlController - Manages all the Rest API endpoints of application
+* ShortUrlController - Manages all the Rest API endpoints of the application
 * ShortUrlService - Manages the core functionalities such as short id creation and retrival of long url
 * ShortUrlRepository - Manages all the data and builds the order of priority between redis cache and mongo db for data
 * ShortUrlMongoRepository - Manages Mongo CRUD
 * ShortIdUtilities - Manages all the application utilities
 
-The solution is built in such a way that we have spin multiple instances of the backend service connected to the Distributed Redis cache server and MongoDB to serve multiple requests. The Redis cache server is introduced as a middle layer to improve the performance of the application.
+<<<<<<< HEAD
+The solution is built in such a way that we can spin multiple instances of the backend service connected to the Distributed Redis cache server and MongoDB to serve multiple requests. The Redis cache server is introduced as a middle layer to improve the performance of the application.
+=======
+The solution is built in such a way that we can spin multiple instances of the backend service connected to the Distributed Redis cache server to serve multiple requests. The Redis cache server is introduced as a middle layer to improve the performance of the application.
+>>>>>>> Changes to README
 
 ## Technology Stack:
 * [Spring Boot](http://spring.io/projects/spring-boot) for creating the RESTful Web Services. API for short URL creation and API for forwarding of short URLs to original ones
 * [Redis Cache](https://redis.io/) used as a distributed in-memory data store. Application is mostly served by the cache server for high performance.
-* [MongoDB](https://www.mongodb.com/) used as a persisten storage for the application. It can be used as a distributed database server. The application is built in a such a way that it cab be switched to different databases.
+* [MongoDB](https://www.mongodb.com/) used as a persistent storage for the application. It can be used as a distributed database server. The application is built in a such a way that it can be switched to different databases.
 * [Google Guava](https://github.com/google/guava) used for hashing functions. The short key generation in the application uses a combination of hash function and counter to generate unique short keys easily.
 * [Spring Actuator](https://spring.io/guides/gs/actuator-service/) used for monitoring and managing your Spring Boot application. Using Actuator endpoints for gathering different statistics of the application. Currently the application is configured to gather statistics from health, info and metrics API. Introduced 4 new custom metrics as part of the implementation. We can extend this furthure more based on the application need.
 * [Maven](https://maven.apache.org/) for building the projects
@@ -80,9 +88,12 @@ URI | HTTP Method | Description | Content-Type | Sample Input(Body) | Sample Out
 ## Salient Features
 * Short URL backend service is highly independent service. The application can be tested independently without mongo db server and redis server installation
 * In runtime, if Distributed Cache server or Database goes down, the application wil not fail. It will log the connection failure and continue to serve the users using only database or only cache server.
-* Docker containers are used for build, test, deploy and run scenarios. Only Docker is required to present in the nodes.
+* Docker containers are used for build, test, deploy and run scenarios. Only Docker is required to be present in the nodes.
 ## Next Steps
-I have taken care of the MVP requirements for this project. The project has scope for future enhancements and improments such as:
+I have taken care of the MVP requirements for this project. The project has scope for future enhancements and improvements such as:
 * Enabling HTTPS for the application.
 * Implementing Authentication and Authorisation for the service
+<<<<<<< HEAD
+* Implementing other APIs for the service
+=======
 * Implementing other APIs for the service
